@@ -1,0 +1,9 @@
+.project
+.pydevproject
+bbb_settings.py
+venv
+virtenv
+.idea
+
+bigbluebutton.egg-info/*
+dist/*
