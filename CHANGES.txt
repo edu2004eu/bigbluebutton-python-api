@@ -1,3 +1,8 @@
+0.8.0
+------
+- reformatted & improved the README
+- added the ability to pass custom params to the `join` call
+
 0.7.0
 ------
 - refactored the MeetingSetup and Meeting classed to one single class
