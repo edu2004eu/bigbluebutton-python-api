@@ -1,68 +1,41 @@
-BigBlueButton Python API
-------------------------
+# BigBlueButton Python API
 
-The work of this project is derivated from https://github.com/schallis/django-bigbluebutton 98f2259fa3 by Steve Challis.
+The work of this project is forked from https://hg.sr.ht/~dreimark/bigbluebutton-python-api
+which in turn is derived from https://github.com/schallis/django-bigbluebutton 98f2259fa3 by Steve Challis.
 
-It is a wrapper for accessing the API of bigbluebutton http://code.google.com/p/bigbluebutton/wiki/API
+It is a wrapper for accessing the API of BigBlueButton https://docs.bigbluebutton.org/dev/api.html
 
+## Installation
 
-A simple example:
-
-.. code-block:: python
-
-   import argparse
-   from bigbluebutton import MeetingSetup, Meeting
-   import bbb_settings
+    pip install bigbluebutton-api
 
 
+## Usage
 
-   if __name__ == '__main__':
-       PARSER = argparse.ArgumentParser(description='creates and join a session')
-       PARSER.add_argument('--meeting_name', dest="meeting_name", type=str, required=True,
-                            help='name of the meeting')
-       PARSER.add_argument('--meeting_id', dest='meeting_id', required=True,
-                           help='id for the meeting')
-       PARSER.add_argument('--moderator', dest='moderator', required=True,
-                           help='name of the meeting moderator')
-       PARSER.add_argument( '--moderator_password', dest='moderator_password', required=True,
-                           help='password for moderator')
-       PARSER.add_argument( '--attendee_password', dest='attendee_password', required=True,
-                           help='password for attendee')
-       PARSER.add_argument( '--url', dest='url', required=True,
-                           help='pre upload url')
+Here are a few things you can do with this library.
 
-       ARGS = PARSER.parse_args()
+    from bigbluebutton import BigBlueButton
+    bbb = BigBlueButton('<YOUR_BBB_URL>', '<YOUR_BBB_SALT>')
+    meeting_id = 'some-meeting-id'
+    bbb.create_meeting(meeting_id, 'Some meeting name', 'attendee password', 'moderator password')
 
-       session = MeetingSetup(bbb_settings.BBB_API_URL, bbb_settings.SALT,
-                              ARGS.meeting_name, ARGS.meeting_id,
-                              ARGS.attendee_password, ARGS.moderator_password,
-                              pre_upload_slide=ARGS.url)
-       session.create_meeting()
-       print("meeting expires if noone joins in")
+    moderator_link = meeting.join_meeting_url(meeting_id, 'Example Moderator', 'moderator password'))
+    attendee_link = meeting.join_meeting_url(meeting_id, 'Example Attendee', 'attendee password'))
 
-       meeting = Meeting(bbb_settings.BBB_API_URL, bbb_settings.SALT)
-       print("MODERATOR:")
-       print(meeting.join_url(ARGS.meeting_id, ARGS.moderator, ARGS.moderator_password))
-       print('-------------------------------------------')
+    all_meetings = meeting.get_meetings()
+    is_running = meeting.is_running(meeting_id)
+    end_link = meeting.end_meeting_url(meeting_id, 'moderator password')
 
-       print("RANDOM USER:")
-       print(meeting.join_url(ARGS.meeting_id, 'RANDOM', ARGS.attendee_password))
-       print('-------------------------------------------')
+    if meeting.is_running(meeting_id):
+        meeting.end_meeting(meeting_id, 'moderator password')
 
-       print("ALL MEETINGS")
-       print(meeting.get_meetings())
-       print('-------------------------------------------')
+#### Disclaimer
 
-       print("IS RUNNING (meeting is only running after someone has joined in)")
-       print(meeting.is_running(ARGS.meeting_id))
-       print('-------------------------------------------')
+I have absolutely no experience with publishing packages to PyPI and with copyright / attributions. I don't intend
+to step on anyone's toes, I just felt like the original library needed a few bugfixes and improvements.
 
-       print("END MEETING URL")
-       print(meeting.end_meeting_url(ARGS.meeting_id, ARGS.moderator_password))
-       print('-------------------------------------------')
+If you feel I haven't recognized your work on this project, please [let me know](mailto:edu2004eu@gmail.com).
 
-
-       if meeting.is_running(ARGS.meeting_id):
-           print("END MEETING")
-           meeting.end_meeting(ARGS.meeting_id, ARGS.moderator_password)
-           print('-------------------------------------------')
+I don't plan on further maintaining this package, unless the BBB API changes enough to break it. We do use this
+in production, however I can't guarantee everything works (we mainly use the `create` and `join` calls). I can, however,
+review any PRs and accept new contributors (after a few approved PRs).

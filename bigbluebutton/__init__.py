@@ -108,7 +108,7 @@ class BigBlueButton(object):
         xml = get_xml(self.bbb_api_url, self.salt, call, query)
         return xml_match(xml, match)
 
-    def join_meeting_url(self, meeting_id, name, password):
+    def join_meeting_url(self, meeting_id, name, password, options):
         """
         generates the url for accessing a meeting
 
@@ -119,13 +119,18 @@ class BigBlueButton(object):
                          If the moderator password is supplied, he will be
                          given moderator status
                          (and the same for attendee password, etc)
+        :param options: Any other optional BBB params as seen here:
+                        https://docs.bigbluebutton.org/dev/api.html#join
         """
         call = 'join'
-        query = urlencode((
+        params = [
             ('fullName', name),
             ('meetingID', meeting_id),
             ('password', password),
-        ))
+        ]
+        params += [(k, v) for k, v in options.items()]
+        query = urlencode(params)
+
         hashed = api_call(self.salt, query, call)
         return self.bbb_api_url + call + '?' + hashed
 
