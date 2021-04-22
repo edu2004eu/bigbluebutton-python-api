@@ -1,3 +1,9 @@
+0.7.0
+------
+- refactored the MeetingSetup and Meeting classed to one single class
+- fixed issue with params being sent as "None" (string)
+- refactored some arguments and function names from the original library
+
 0.6.0
 ------
 refactored to python 3

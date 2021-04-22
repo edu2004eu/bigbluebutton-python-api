@@ -1,38 +1,33 @@
 # Copyright: 2011 Steve Challis (http://schallis.com)
 # Copyright: 2012-2020 ReimarBauer (rb.proj@gmail.com)
+# Copyright: 2021 Eduard Luca (edu2004eu@gmail.com)
 # License: MIT
 
 """
-    bigbluebutton python api
+    BigBlueButton Python API
 
-
-
-    This module contains functions to access bigbluebutton servers
-    Meeting_Setup: for initializing a meeting.
-    Meeting: for operations on the meeting after initializing.
-
+    This module contains functions to access BigBlueButton servers
 """
-import random
 from urllib.parse import urlencode
 from bigbluebutton.utils import api_call, get_xml, xml_match
 
 
-class MeetingSetup(object):
-    """
-    Initializes meetings
-    """
-
-    def __init__(self, bbb_api_url=None, salt=None, meeting_name='', meeting_id='',
-                 attendee_password=None, moderator_password=None,
-                 logout_url='', max_participants=-1, duration=0, dial_number='',
-                 welcome='Welcome!',
-                 moderator_only_message='', meta='',
-                 record=False, auto_start_recording=False, allow_start_stop_recording=True,
-                 pre_upload_slide=None
-                 ):
+class BigBlueButton(object):
+    def __init__(self, bbb_api_url=None, salt=None):
         """
         :param bbb_api_url: The url to your bigbluebutton instance (including the api/)
         :param salt: The security salt defined for your bigbluebutton instance
+        """
+        self.bbb_api_url = bbb_api_url
+        self.salt = salt
+
+    def create_meeting(self, meeting_id, meeting_name='',
+                       attendee_password=None, moderator_password=None,
+                       logout_url=None, max_participants=None, duration=None, dial_number=None,
+                       welcome=None, moderator_only_message=None, meta=None,
+                       record=None, auto_start_recording=None, allow_start_stop_recording=None,
+                       pre_upload_slide=None):
+        """
         :param meeting_name: A name for the meeting.
         :param meeting_id: A meeting ID that can be used to identify this meeting by the third party application.
                            This must be unique to the server that you are calling. If you supply a non-unique
@@ -76,70 +71,29 @@ class MeetingSetup(object):
                                            recording from the client.
         :param pre_upload_slide: You can preupload slides within the create call by providing an URL to the slides.
         """
-        self.bbb_api_url = bbb_api_url
-        self.salt = salt
-        self.meeting_name = meeting_name
-        self.meeting_id = meeting_id
-        self.attendee_password = attendee_password
-        self.moderator_password = moderator_password
-        self.logout_url = logout_url
-        self.max_participants = max_participants
-        self.duration = duration
-        self.dial_number = dial_number
-        self.welcome = welcome
-        self.record = str(record).lower()
-        self.moderator_only_message = moderator_only_message
-        self.meta = meta
-        self.allow_start_stop_recording = allow_start_stop_recording
-        self.auto_start_recording = auto_start_recording
-        self.pre_upload_slide = pre_upload_slide
+        call = 'create'
+        params = (
+            ('name', meeting_name),
+            ('meetingID', meeting_id),
+            ('attendeePW', attendee_password),
+            ('moderatorPW', moderator_password),
+            ('dialNumber', dial_number),
+            ('welcome', welcome),
+            ('logoutURL', logout_url),
+            ('maxParticipants', max_participants),
+            ('duration', duration),
+            ('record', record),
+            ('meta', meta),
+            ('moderatorOnlyMessage', moderator_only_message),
+            ('autoStartRecording', auto_start_recording),
+            ('allowStartStopRecording', allow_start_stop_recording),
+        )
 
-    def create_meeting(self):
-        """
-        creates the meeting
-        """
-        if not Meeting(self.bbb_api_url, self.salt).is_running(self.meeting_id):
-            call = 'create'
-            if self.pre_upload_slide is not None:
-                self.welcome = ('The presentation will appear in moment.  To download click <a href="%(url)s"></a>.'
-                                '<br> %(welcome)s' % {"url": self.pre_upload_slide,
-                                                      "welcome": self.welcome})
-            voicebridge = 70000 + random.randint(0, 9999)
-            query = urlencode((
-                ('name', self.meeting_name),
-                ('meetingID', self.meeting_id),
-                ('attendeePW', self.attendee_password),
-                ('moderatorPW', self.moderator_password),
-                ('voiceBridge', voicebridge),
-                ('dialNumber', self.dial_number),
-                ('welcome', self.welcome),
-                ('logoutURL', self.logout_url),
-                ('maxParticipants', self.max_participants),
-                ('duration', self.duration),
-                ('record', self.record),
-                ('meta', self.meta),
-                ('moderatorOnlyMessage', self.moderator_only_message),
-                ('autoStartRecording', self.auto_start_recording),
-                ('allowStartStopRecording', self.allow_start_stop_recording),
-            ))
-            xml = get_xml(self.bbb_api_url, self.salt, call, query, self.pre_upload_slide)
-            return xml is not None
+        query = urlencode([(param[0], param[1]) for param in params if param[1] is not None])
+        xml = get_xml(self.bbb_api_url, self.salt, call, query, pre_upload_slide)
+        return xml is not None
 
-
-class Meeting(object):
-    """
-    gives access to meetings
-    """
-
-    def __init__(self, bbb_api_url=None, salt=None):
-        """
-        :param bbb_api_url: The url to your bigbluebutton instance (including the api/)
-        :param salt: The security salt defined for your bigbluebutton instance
-        """
-        self.bbb_api_url = bbb_api_url
-        self.salt = salt
-
-    def is_running(self, meeting_id):
+    def is_meeting_running(self, meeting_id):
         """
         This call enables you to simply check on whether or not a meeting is
         running by looking it up with your meeting ID.
@@ -154,7 +108,7 @@ class Meeting(object):
         xml = get_xml(self.bbb_api_url, self.salt, call, query)
         return xml_match(xml, match)
 
-    def join_url(self, meeting_id, name, password):
+    def join_meeting_url(self, meeting_id, name, password):
         """
         generates the url for accessing a meeting
 
@@ -179,7 +133,7 @@ class Meeting(object):
         """
         Use this to generate the url to end a meeting
 
-        :param meetingID: The meeting ID that identifies the meeting you are attempting to end.
+        :param meeting_id: The meeting ID that identifies the meeting you are attempting to end.
         :param password: The moderator password for this meeting.
                          You can not end a meeting using the attendee password.
         """
@@ -196,7 +150,7 @@ class Meeting(object):
         """
         Use this to forcibly end a meeting and kick all participants out of the meeting.
 
-        :param meetingID: The meeting ID that identifies the meeting you are attempting to end.
+        :param meeting_id: The meeting ID that identifies the meeting you are attempting to end.
         :param password: The moderator password for this meeting.
                          You can not end a meeting using the attendee password.
         """
@@ -213,7 +167,7 @@ class Meeting(object):
         This call will return all of a meeting's information,
         including the list of attendees as well as start and end times.
 
-        :param meetingID: The meeting ID that identifies the meeting
+        :param meeting_id: The meeting ID that identifies the meeting
         :param password: The moderator password for this meeting.
         """
         call = 'getMeetingInfo'
@@ -228,10 +182,8 @@ class Meeting(object):
             attendees = xml.find('attendees')
             if attendees is not None:
                 for attendee in attendees.getchildren():
-                    user = {}
-                    user['user_id'] = attendee.find('userID').text
-                    user['name'] = attendee.find('fullName').text
-                    user['role'] = attendee.find('role').text
+                    user = {'user_id': attendee.find('userID').text, 'name': attendee.find('fullName').text,
+                            'role': attendee.find('role').text}
                     users.append(user)
 
             meeting_info = {
@@ -291,7 +243,7 @@ class Meeting(object):
         """
         Retrieves the recordings that are available for playback for a given meetingID (or set of meeting IDs).
 
-        :param meetingID: The meeting ID that identifies the meeting
+        :param meeting_id: The meeting ID that identifies the meeting
         """
         call = 'getRecordings'
         query = urlencode((
@@ -304,13 +256,10 @@ class Meeting(object):
             recordings = xml.find('recordings')
             records = []
             for meeting in recordings.getchildren():
-                record = {}
-                record['record_id'] = meeting.find('recordID').text
-                record['meeting_id'] = meeting.find('meetingID').text
-                record['meeting_name'] = meeting.find('name').text
-                record['published'] = meeting.find('published').text == "true"
-                record['start_time'] = meeting.find('startTime').text
-                record['end_time'] = meeting.find('endTime').text
+                record = {'record_id': meeting.find('recordID').text, 'meeting_id': meeting.find('meetingID').text,
+                          'meeting_name': meeting.find('name').text,
+                          'published': meeting.find('published').text == "true",
+                          'start_time': meeting.find('startTime').text, 'end_time': meeting.find('endTime').text}
                 records.append(record)
             return records
         else:

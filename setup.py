@@ -5,14 +5,14 @@ from setuptools import setup, find_packages
 requires = ["requests"]
 
 setup(
-    name='bigbluebutton',
-    version='0.6.0',
+    name='bigbluebutton-api',
+    version='0.7.0',
     author='Reimar Bauer',
     author_email='rb.proj@gmail.com',
-    maintainer='Reimar Bauer',
-    maintainer_email='rb.proj@gmail.com',
-    url='https://hg.sr.ht/~dreimark/bigbluebutton-python-api',
-    description='Python API for bigbluebutton.',
+    maintainer='Eduard Luca',
+    maintainer_email='edu2004eu@gmail.com',
+    url='https://github.com/edu2004eu/bigbluebutton-python-api',
+    description='Python API for BigBlueButton.',
     long_description=long_description,
     keywords='bigbluebutton',
     license='MIT',
