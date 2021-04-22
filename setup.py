@@ -6,7 +6,7 @@ requires = ["requests"]
 
 setup(
     name='bigbluebutton-api',
-    version='0.8.0',
+    version='0.8.1',
     author='Reimar Bauer',
     author_email='rb.proj@gmail.com',
     maintainer='Eduard Luca',
