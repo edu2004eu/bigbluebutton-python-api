@@ -1,4 +1,4 @@
-long_description = open('README.txt').read()
+long_description = open('README.md').read()
 
 from setuptools import setup, find_packages
 
@@ -14,6 +14,7 @@ setup(
     url='https://github.com/edu2004eu/bigbluebutton-python-api',
     description='Python API for BigBlueButton.',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     keywords='bigbluebutton',
     license='MIT',
     packages=find_packages(),
