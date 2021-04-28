@@ -1,5 +1,6 @@
 # Copyright: 2011 Steve Challis (http://schallis.com)
 # Copyright: 2012-2020 MoinMoin:ReimarBauer
+# Copyright: 2021 Eduard Luca (edu2004eu@gmail.com)
 # License: MIT
 
 """
@@ -12,9 +13,10 @@ import requests
 import xml.etree.ElementTree as ET
 from hashlib import sha1
 
+
 def parse(response):
     """
-    :param reponse: XML Data
+    :param response: XML Data
     """
     try:
         xml = ET.fromstring(response)
@@ -23,9 +25,10 @@ def parse(response):
             return xml
         else:
             return None
-    #XXX refactor exception
+    # XXX refactor exception
     except:
         return None
+
 
 def api_call(salt, query, call):
     """
@@ -38,6 +41,7 @@ def api_call(salt, query, call):
     prepared = "%s%s%s" % (call, query, salt)
     checksum = sha1(prepared.encode('utf-8')).hexdigest()
     return "%s&checksum=%s" % (query, checksum)
+
 
 def get_xml(bbb_api_url, salt, call, query, pre_upload_slide=None):
     """

@@ -26,7 +26,7 @@ class BigBlueButton(object):
                        logout_url=None, max_participants=None, duration=None, dial_number=None,
                        welcome=None, moderator_only_message=None, meta=None,
                        record=None, auto_start_recording=None, allow_start_stop_recording=None,
-                       pre_upload_slide=None):
+                       pre_upload_slide=None, options=None):
         """
         :param meeting_name: A name for the meeting.
         :param meeting_id: A meeting ID that can be used to identify this meeting by the third party application.
@@ -70,9 +70,11 @@ class BigBlueButton(object):
                                            (autoStartRecording=true) with the user able to stop/start
                                            recording from the client.
         :param pre_upload_slide: You can preupload slides within the create call by providing an URL to the slides.
+        :param options: Any other optional BBB params as seen here:
+                        https://docs.bigbluebutton.org/dev/api.html#create
         """
         call = 'create'
-        params = (
+        params = [
             ('name', meeting_name),
             ('meetingID', meeting_id),
             ('attendeePW', attendee_password),
@@ -87,7 +89,10 @@ class BigBlueButton(object):
             ('moderatorOnlyMessage', moderator_only_message),
             ('autoStartRecording', auto_start_recording),
             ('allowStartStopRecording', allow_start_stop_recording),
-        )
+        ]
+
+        if options:
+            params += [(k, v) for k, v in options.items()]
 
         query = urlencode([(param[0], param[1]) for param in params if param[1] is not None])
         xml = get_xml(self.bbb_api_url, self.salt, call, query, pre_upload_slide)
@@ -108,7 +113,7 @@ class BigBlueButton(object):
         xml = get_xml(self.bbb_api_url, self.salt, call, query)
         return xml_match(xml, match)
 
-    def join_meeting_url(self, meeting_id, name, password, options):
+    def join_meeting_url(self, meeting_id, name, password, options=None):
         """
         generates the url for accessing a meeting
 
@@ -128,7 +133,10 @@ class BigBlueButton(object):
             ('meetingID', meeting_id),
             ('password', password),
         ]
-        params += [(k, v) for k, v in options.items()]
+
+        if options:
+            params += [(k, v) for k, v in options.items()]
+
         query = urlencode(params)
 
         hashed = api_call(self.salt, query, call)

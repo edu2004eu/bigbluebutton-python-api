@@ -1,3 +1,8 @@
+0.8.2
+------
+- added `options` argument to the meeting create call
+- fixed an issue with not sending the `options` argument on the join call
+
 0.8.0
 ------
 - reformatted & improved the README
