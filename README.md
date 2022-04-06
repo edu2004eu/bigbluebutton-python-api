@@ -19,15 +19,15 @@ Here are a few things you can do with this library.
     meeting_id = 'some-meeting-id'
     bbb.create_meeting(meeting_id, 'Some meeting name', 'attendee password', 'moderator password')
 
-    moderator_link = meeting.join_meeting_url(meeting_id, 'Example Moderator', 'moderator password'))
-    attendee_link = meeting.join_meeting_url(meeting_id, 'Example Attendee', 'attendee password'))
+    moderator_link = bbb.join_meeting_url(meeting_id, 'Example Moderator', 'moderator password'))
+    attendee_link = bbb.join_meeting_url(meeting_id, 'Example Attendee', 'attendee password'))
 
-    all_meetings = meeting.get_meetings()
-    is_running = meeting.is_running(meeting_id)
-    end_link = meeting.end_meeting_url(meeting_id, 'moderator password')
+    all_meetings = bbb.get_meetings()
+    is_running = bbb.is_running(meeting_id)
+    end_link = bbb.end_meeting_url(meeting_id, 'moderator password')
 
-    if meeting.is_running(meeting_id):
-        meeting.end_meeting(meeting_id, 'moderator password')
+    if bbb.is_running(meeting_id):
+        bbb.end_meeting(meeting_id, 'moderator password')
 
 #### Disclaimer
 
