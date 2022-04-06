@@ -181,7 +181,6 @@ class BigBlueButton(object):
         including the list of attendees as well as start and end times.
 
         :param meeting_id: The meeting ID that identifies the meeting
-        :param password: The moderator password for this meeting.
         """
         call = 'getMeetingInfo'
         query = urlencode((
