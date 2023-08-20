@@ -175,18 +175,16 @@ class BigBlueButton(object):
         xml = get_xml(self.bbb_api_url, self.salt, call, query)
         return xml is not None
 
-    def meeting_info(self, meeting_id, password):
+    def meeting_info(self, meeting_id):
         """
         This call will return all of a meeting's information,
         including the list of attendees as well as start and end times.
 
         :param meeting_id: The meeting ID that identifies the meeting
-        :param password: The moderator password for this meeting.
         """
         call = 'getMeetingInfo'
         query = urlencode((
             ('meetingID', meeting_id),
-            ('password', password),
         ))
         xml = get_xml(self.bbb_api_url, self.salt, call, query)
         if xml is not None:
@@ -244,9 +242,7 @@ class BigBlueButton(object):
                     'has_been_forcibly_ended': meeting.find('hasBeenForciblyEnded').text == "true",
                     'running': meeting.find('running').text == "true",
                     'create_time': int(meeting.find('createTime').text),
-                    'info': self.meeting_info(
-                        meeting_id,
-                        password)
+                    'info': self.meeting_info(meeting_id)
                 })
             return all_meetings
         else:
